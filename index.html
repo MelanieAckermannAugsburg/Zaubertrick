@@ -1,0 +1,616 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Der Zaubertrick</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Emilys+Candy&family=Nunito+Sans:wght@400;600;700&display=swap">
+<style>
+/* Layout: eine schmale Lernspalte; pro Bildschirm genau ein Schritt: Überschrift, Aufgabe, eine Frage, eine Aktion */
+:root{
+  --bg:#F4F6F9; --surface:#FFFFFF; --ink:#1A1D23; --muted:#5A6271; --line:#C8CDD6;
+  --accent:#2747B8; --accent-soft:#E5EAFA; --on-accent:#FFFFFF;
+  --ok:#1E7547; --ok-soft:#E1F1E7; --bad:#AE302D; --bad-soft:#F8E4E3;
+  --font-head:"Emilys Candy","Comic Neue",cursive;
+  --font-body:"Avenir Next LT Pro","Avenir Next",Avenir,"Nunito Sans",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#13161B; --surface:#1C2027; --ink:#E7EAF0; --muted:#A2AAB7; --line:#3A414D;
+  --accent:#93ABF3; --accent-soft:#222B45; --on-accent:#10131A;
+  --ok:#6DC89A; --ok-soft:#183126; --bad:#F08B87; --bad-soft:#3A2121; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#13161B; --surface:#1C2027; --ink:#E7EAF0; --muted:#A2AAB7; --line:#3A414D;
+  --accent:#93ABF3; --accent-soft:#222B45; --on-accent:#10131A;
+  --ok:#6DC89A; --ok-soft:#183126; --bad:#F08B87; --bad-soft:#3A2121; color-scheme:dark}
+
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+main{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1,h2{font-family:var(--font-head);font-weight:400;text-align:center;margin:0;text-decoration:underline;
+  text-decoration-thickness:1.5px;text-underline-offset:6px;text-wrap:balance;line-height:1.25}
+h1{font-size:2.2rem} h2{font-size:1.55rem}
+p{margin:0}
+.lead{text-align:center;color:var(--muted);text-wrap:balance}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.demo-btn{display:flex;flex-direction:column;gap:2px;text-align:left;background:var(--accent);color:var(--on-accent);
+  border:none;border-radius:12px;padding:16px 18px;cursor:pointer}
+.demo-btn .t{font-weight:700;font-size:1.08rem}
+.demo-btn .d{opacity:.85;font-size:.93rem}
+.menu{display:grid;gap:10px}
+.menu button{display:grid;grid-template-columns:2.4rem 1fr;column-gap:12px;align-items:start;text-align:left;
+  background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;cursor:pointer}
+.menu button:hover{border-color:var(--accent)}
+.menu .nr{grid-row:span 3;font-family:var(--font-head);font-size:2rem;line-height:1;color:var(--accent);text-align:center;padding-top:2px}
+.menu .t{font-weight:700}
+.menu .d{color:var(--muted);font-size:.93rem}
+.menu .last{font-size:.85rem;color:var(--ok);font-weight:600;margin-top:2px}
+
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.back{background:none;border:none;color:var(--accent);font-weight:700;padding:6px 0;cursor:pointer}
+.stage{color:var(--muted);font-size:.9rem;text-align:right}
+.prog{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:.88rem;font-variant-numeric:tabular-nums;margin-bottom:-10px}
+.segs{display:flex;gap:5px}
+.segs i{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.segs i.done{background:var(--ink)}
+.segs i.cur{background:var(--accent)}
+
+.aufgabe{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 16px;font-size:.98rem;color:var(--muted)}
+.aufgabe strong{color:var(--ink);font-weight:700;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px}
+.aufgabe.big{font-size:1.3rem;line-height:1.55;padding:22px 20px;color:var(--ink);border-color:var(--ink)}
+.anweisung{font-weight:700;text-align:center;text-wrap:balance;font-size:1.08rem}
+.erklaerung{background:var(--accent-soft);border-radius:12px;padding:14px 16px;font-size:1.05rem;text-wrap:pretty}
+
+.opts{display:grid;gap:10px}
+.opt{text-align:left;padding:13px 16px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;font-size:1.05rem;font-variant-numeric:tabular-nums}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok);background:var(--ok-soft);color:var(--ok);font-weight:700}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);text-decoration:line-through}
+.opts.done .opt:not(.right):not(.wrong){opacity:.45}
+.opts.wait .opt:not(.wrong){opacity:.6}
+.w{background:none;border:none;padding:1px 2px;margin:0 -1px;font:inherit;color:inherit;cursor:pointer;border-radius:5px;line-height:inherit;white-space:nowrap}
+.w:hover{background:var(--accent-soft)}
+.w.on,.mk{color:var(--ink);font-weight:700;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+.w.on{background:var(--accent-soft)}
+.antwort{text-align:center;font-size:1.12rem;text-wrap:balance}
+
+/* Kreuz-Schema: SVG für Linien, darüber HTML-Felder im gleichen Koordinatensystem (360 × 252) */
+.schema{position:relative;width:100%;max-width:440px;margin:0 auto;aspect-ratio:360/252}
+.schema svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.cell{position:absolute;display:flex;align-items:center;justify-content:center;box-sizing:border-box;
+  border:1.5px solid var(--ink);border-radius:8px;background:var(--surface);
+  font-size:clamp(.95rem,3.9vw,1.15rem);white-space:nowrap;padding:0 4px;font-variant-numeric:tabular-nums}
+.cell.empty{border-style:dashed;border-color:var(--muted);background:transparent}
+.cell.tap{cursor:pointer}
+.cell.tap:not(.empty):hover{border-color:var(--accent)}
+.cell.target{border:2.5px solid var(--accent);background:var(--accent-soft)}
+.cell.q{font-weight:700;font-size:1.35rem;border-width:2.5px}
+.cell.res{font-weight:700;color:var(--accent);border:2.5px solid var(--accent)}
+.sv-head{fill:var(--muted);font-size:12.5px;font-family:var(--font-body)}
+.eqs{stroke:var(--ink);fill:none;stroke-width:1.5}
+.arr path{fill:none;stroke-width:1.75;stroke-linecap:round}
+.arr.ink path,.arr.ink .op{stroke:var(--ink)}
+.arr.acc path,.arr.acc .op{stroke:var(--accent)}
+.arr.acc path{stroke-width:2.25;stroke-dasharray:1;animation:draw .6s ease-out both}
+.op{fill:var(--surface);stroke-width:1.75}
+.arr.ink .dot,.arr.ink .sv-step{fill:var(--ink)}
+.arr.acc .dot,.arr.acc .sv-step{fill:var(--accent)}
+.sv-step{font-size:15px;font-weight:700;font-family:var(--font-body)}
+.mk-ink{fill:var(--ink)} .mk-acc{fill:var(--accent)}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+
+.tray{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.chip{font-size:1.12rem;min-width:5.6rem;padding:10px 14px;border:1.5px solid var(--ink);border-radius:8px;
+  background:var(--surface);cursor:pointer;font-variant-numeric:tabular-nums}
+.chip.sel{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.tray-empty{color:var(--muted);text-align:center;font-size:.93rem}
+
+.rechnung{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;font-size:1.25rem;font-variant-numeric:tabular-nums}
+.rechnung input{width:5.2em;font:inherit;font-size:1.15rem;padding:8px 6px;text-align:center;border:1.5px solid var(--line);
+  border-radius:8px;background:var(--surface);color:var(--ink)}
+.rechnung input.wide{width:6.4em}
+.rechnung input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
+.sn{font-weight:700;color:var(--accent)}
+.fix{font-weight:600}
+.erledigt{text-align:center;font-size:1.15rem;font-variant-numeric:tabular-nums}
+
+.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn{font-weight:700;padding:12px 24px;border-radius:10px;border:1.5px solid var(--accent);background:var(--accent);color:var(--on-accent);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn:disabled{opacity:.4;cursor:default}
+.feedback{text-align:center;border-radius:10px;padding:10px 14px;text-wrap:balance}
+.feedback.ok{background:var(--ok-soft);color:var(--ok);font-weight:600}
+.feedback.bad{background:var(--bad-soft);color:var(--bad)}
+.feedback.info{background:var(--accent-soft);color:var(--ink)}
+.linkbtn{display:inline-block;margin-top:6px;background:none;border:none;color:var(--accent);font-weight:700;text-decoration:underline;cursor:pointer;padding:2px}
+
+.tipp{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:10px 16px}
+.tipp summary{cursor:pointer;font-weight:700;color:var(--accent)}
+.tipp ul{margin:8px 0 2px;padding-left:1.2em;display:grid;gap:4px}
+.score{font-family:var(--font-head);font-size:3rem;text-align:center;line-height:1.1}
+
+@media (prefers-reduced-motion: reduce){.arr.acc path{animation:none}}
+</style>
+
+<main id="app"></main>
+
+<script>
+const POOL = [
+  {text:'Der Weg zur Arbeit ist **40 km** lang. **10 km** davon fährst du mit dem Fahrrad. Wie viel Prozent sind das?', gw:40, pw:10, ps:25, sought:'PS', unit:'km', head:'Kilometer', answer:'Das sind {r} % des Wegs.'},
+  {text:'Heute fehlen **3 Personen** im Kurs. Das sind **25 %** aller Teilnehmenden. Wie viele Personen sind im Kurs?', gw:12, pw:3, ps:25, sought:'GW', unit:'Personen', head:'Personen', answer:'Im Kurs sind {r} Personen.'},
+  {text:'Ein Getränkemarkt hat **80 Kisten** Wasser. **25 %** davon sind schon verkauft. Wie viele Kisten sind das?', gw:80, pw:20, ps:25, sought:'PW', unit:'Kisten', head:'Kisten', answer:'Es sind {r} Kisten verkauft.'},
+  {text:'Dein Datenvolumen beträgt **20 GB** im Monat. Du hast schon **15 GB** verbraucht. Wie viel Prozent sind das?', gw:20, pw:15, ps:75, sought:'PS', unit:'GB', head:'Gigabyte', answer:'Du hast {r} % verbraucht.'},
+  {text:'Bei einer Abstimmung stimmen **30 Personen** mit Ja. Das sind **60 %** aller Stimmen. Wie viele Personen haben abgestimmt?', gw:50, pw:30, ps:60, sought:'GW', unit:'Personen', head:'Personen', answer:'Es haben {r} Personen abgestimmt.'},
+  {text:'Ein Autotank fasst **50 l**. Er ist zu **60 %** voll. Wie viele Liter sind im Tank?', gw:50, pw:30, ps:60, sought:'PW', unit:'l', head:'Liter', answer:'Im Tank sind {r} Liter.'},
+  {text:'Eine Auszubildende arbeitet **40 Stunden** in der Woche. **8 Stunden** davon ist sie in der Berufsschule. Wie viel Prozent sind das?', gw:40, pw:8, ps:20, sought:'PS', unit:'Std.', head:'Stunden', answer:'Das sind {r} % der Arbeitszeit.'},
+  {text:'Ein Brotteig wiegt **1 000 g**. **2 %** davon sind Salz. Wie viel Gramm Salz sind im Teig?', gw:1000, pw:20, ps:2, sought:'PW', unit:'g', head:'Gramm', answer:'Im Teig sind {r} g Salz.'},
+  {text:'Für ein Konzert sind **400 Tickets** verkauft. Das sind **80 %** aller Tickets. Wie viele Tickets gibt es insgesamt?', gw:500, pw:400, ps:80, sought:'GW', unit:'Tickets', head:'Tickets', answer:'Es gibt {r} Tickets.'},
+  {text:'Ein Lauf ist **12 km** lang. Nach **3 km** machst du eine Pause. Wie viel Prozent der Strecke hast du geschafft?', gw:12, pw:3, ps:25, sought:'PS', unit:'km', head:'Kilometer', answer:'Du hast {r} % der Strecke geschafft.'},
+  {text:'Ein Handy kostet **450 €**. Im Angebot ist es **10 %** günstiger. Wie viel Euro sparst du?', gw:450, pw:45, ps:10, sought:'PW', unit:'€', head:'Euro', answer:'Du sparst {r} €.'},
+  {text:'In einer Klasse sind **20 Personen**. **12 Personen** davon haben schon einen Ausbildungsplatz. Wie viel Prozent sind das?', gw:20, pw:12, ps:60, sought:'PS', unit:'Personen', head:'Personen', answer:'Das sind {r} % der Klasse.'},
+  {text:'Ein Pflegedienst besucht jeden Tag **40 Personen**. **15 %** davon besucht er zweimal. Wie viele Personen sind das?', gw:40, pw:6, ps:15, sought:'PW', unit:'Personen', head:'Personen', answer:'Das sind {r} Personen.'},
+  {text:'Ein Sofa ist um **25 %** reduziert. Du sparst **120 €**. Wie viel hat das Sofa vorher gekostet?', gw:480, pw:120, ps:25, sought:'GW', unit:'€', head:'Euro', answer:'Das Sofa hat vorher {r} € gekostet.'},
+  {text:'Eine Lehrerin hat schon **28 Tests** korrigiert. Das sind **70 %** aller Tests. Wie viele Tests muss sie insgesamt korrigieren?', gw:40, pw:28, ps:70, sought:'GW', unit:'Tests', head:'Tests', answer:'Sie muss {r} Tests korrigieren.'},
+  {text:'Ein Film dauert **120 Minuten**. Du hast schon **90 Minuten** geschaut. Wie viel Prozent des Films hast du gesehen?', gw:120, pw:90, ps:75, sought:'PS', unit:'Min.', head:'Minuten', answer:'Du hast {r} % des Films gesehen.'},
+  {text:'Die Ausbildungsvergütung steigt um **4 %**. Das sind **40 €** mehr im Monat. Wie hoch war die Vergütung vorher?', gw:1000, pw:40, ps:4, sought:'GW', unit:'€', head:'Euro', answer:'Die Vergütung war vorher {r} €.'},
+  {text:'Du hast schon **700 €** für den Führerschein gespart. Das sind **20 %** der Kosten. Wie viel kostet der Führerschein?', gw:3500, pw:700, ps:20, sought:'GW', unit:'€', head:'Euro', answer:'Der Führerschein kostet {r} €.'},
+  {text:'Eine Paketbotin muss **120 Pakete** ausliefern. Bis Mittag schafft sie **75 %** davon. Wie viele Pakete sind das?', gw:120, pw:90, ps:75, sought:'PW', unit:'Pakete', head:'Pakete', answer:'Sie schafft bis Mittag {r} Pakete.'},
+  {text:'Ein Bus hat **40 Plätze**. **80 %** davon sind besetzt. Wie viele Plätze sind besetzt?', gw:40, pw:32, ps:80, sought:'PW', unit:'Plätze', head:'Plätze', answer:'Es sind {r} Plätze besetzt.'}
+];
+
+const DEMO = [
+  { t:{text:'Eine Jacke kostet **300 €**. Es gibt **20 %** Rabatt. Wie viel Euro spart man?', gw:300, pw:60, ps:20, sought:'PW', unit:'€', head:'Euro', answer:'Man spart {r} €.'},
+    steps:[
+      {title:'Lies die Aufgabe', text:'Lies die Aufgabe in Ruhe. Unterstreiche dann die beiden Zahlen, mit denen du rechnest: 300 € und 20 %.'},
+      {title:'Das Ganze', text:'Steht das Ganze in der Aufgabe? Ja: Die Jacke kostet 300 €. Das ist der ganze Preis, also 100 %.'},
+      {title:'Die obere Zeile', show:'top', text:'Das Ganze ist bekannt. Darum steht oben: 100 % ≙ 300 €.'},
+      {title:'Die untere Zeile', show:'all', text:'Die 20 % kommen unter die 100 %. Daneben steht das Fragezeichen.'},
+      {title:'Pfeil ①', show:'all', arrows:1, text:'Pfeil ① geht von 20 % schräg nach oben zu 300 €. Rechne: 20 · 300 = 6 000'},
+      {title:'Pfeil ②', show:'all', arrows:2, text:'Pfeil ② geht oben weiter zu 100 %. Rechne: 6 000 : 100 = 60'},
+      {title:'Kann das stimmen?', show:'all', arrows:2, result:true, text:'20 % ist weniger als die Hälfte. Also muss man weniger als die Hälfte von 300 € sparen, also weniger als 150 €. 60 € passt. Antwort: Man spart 60 €.'}
+    ]},
+  { t:{text:'Die Miete steigt um **5 %**. Das sind **40 €** mehr. Wie hoch war die Miete vorher?', gw:800, pw:40, ps:5, sought:'GW', unit:'€', head:'Euro', answer:'Die Miete war vorher {r} €.'},
+    steps:[
+      {title:'Lies die Aufgabe', text:'Lies die Aufgabe in Ruhe. Unterstreiche dann die beiden Zahlen, mit denen du rechnest: 5 % und 40 €.'},
+      {title:'Das Ganze', text:'Steht das Ganze in der Aufgabe? Nein: Die 40 € sind nur die Erhöhung, also ein Teil. Gesucht ist die ganze Miete.'},
+      {title:'Die obere Zeile', show:'top', text:'Das Ganze ist gesucht. Darum stehen oben die beiden Zahlen aus der Aufgabe: 5 % ≙ 40 €.'},
+      {title:'Die untere Zeile', show:'all', text:'Die 100 % kommen unter die 5 %. Daneben steht das Fragezeichen: die ganze Miete.'},
+      {title:'Pfeil ①', show:'all', arrows:1, text:'Pfeil ① geht von 100 % schräg nach oben zu 40 €. Rechne: 100 · 40 = 4 000'},
+      {title:'Pfeil ②', show:'all', arrows:2, text:'Pfeil ② geht oben weiter zu 5 %. Rechne: 4 000 : 5 = 800'},
+      {title:'Kann das stimmen?', show:'all', arrows:2, result:true, text:'40 € sind nur 5 %, viel weniger als die Hälfte. Also muss die ganze Miete mehr als das Doppelte von 40 € sein, also mehr als 80 €. 800 € passt. Antwort: Die Miete war vorher 800 €.'}
+    ]}
+];
+
+const TITLES = {lesen:'Lies die Aufgabe', lesenMark:'Lies die Aufgabe', ganzeDa:'Das Ganze', ganzeWelche:'Das Ganze', schema:'Das Schema', p1:'Pfeil ①', p2:'Pfeil ②', pruefen:'Kann das stimmen?', ergebnis:'Die Antwort'};
+const STAGES = {
+  1:{name:'Stufe 1', title:'Nur die Methode', desc:'Das Schema ist schon fertig. Du übst die beiden Pfeile.'},
+  2:{name:'Stufe 2', title:'Untere Zeile eintragen', desc:'Du findest das Ganze und trägst die untere Zeile ein.'},
+  3:{name:'Stufe 3', title:'Alles selbst', desc:'Du findest das Ganze und trägst alles selbst ins Schema ein.'}
+};
+const ROUND = {1:{PW:3, PS:3, GW:2}, 2:{PW:2, PS:2, GW:2}, 3:{PW:2, PS:2, GW:2}};
+const FADE_AFTER = 3;
+const P = {TL:[80,96], TR:[280,96], BL:[80,186], BR:[280,186]};
+const KEYS = ['TL','TR','BL','BR'];
+const OPP = {TL:'BR',TR:'BL',BL:'TR',BR:'TL'}, ROW = {TL:'TR',TR:'TL',BL:'BR',BR:'BL'}, COL = {TL:'BL',BL:'TL',TR:'BR',BR:'TR'};
+const NAMES = {TL:'oben links',TR:'oben rechts',BL:'unten links',BR:'unten rechts'};
+const STORE = 'zaubertrick-v1';
+
+const app = document.getElementById('app');
+let S = {view:'home'};
+
+/* ---------- Hilfsfunktionen ---------- */
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+function fmt(n){ const r = Math.round(n * 100) / 100; let [i, d] = String(r).split('.'); i = i.replace(/\B(?=(\d{3})+(?!\d))/g, ' '); return d ? i + ',' + d : i; }
+function num(s){ s = String(s || '').replace(/[^\d,.\-]/g, ''); if (!s) return NaN;
+  if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.'); else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');
+  return parseFloat(s); }
+const gv = id => document.getElementById(id).value;
+const same = (a, b) => Math.abs(a - b) < 1e-6;
+const kind = r => !r ? null : (r === 'P100' || r === 'PS') ? 'p' : 'v';
+function val(r, t){ return r === 'P100' ? 100 : r === 'PS' ? t.ps : r === 'GW' ? t.gw : t.pw; }
+function label(r, t, hideQ = true){
+  if (hideQ && r === t.sought) return '?';
+  if (r === 'P100') return '100 %';
+  if (r === 'PS') return fmt(t.ps) + ' %';
+  return fmt(val(r, t)) + ' ' + t.unit;
+}
+const L = (r, t) => label(r, t, false);
+const amt = (n, t) => fmt(n) + ' ' + t.unit;
+function stdGrid(t){ return t.sought === 'GW' ? {TL:'PS', TR:'PW', BL:'P100', BR:'GW'} : {TL:'P100', TR:'GW', BL:'PS', BR:'PW'}; }
+function flowOf(grid, t){ const q = KEYS.find(k => grid[k] === t.sought); const divisor = OPP[q]; return {q, divisor, partner: ROW[divisor], start: COL[divisor]}; }
+function load(){ try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch (e) { return {}; } }
+function save(o){ try { localStorage.setItem(STORE, JSON.stringify(o)); } catch (e) {} }
+const segs = (n, cur) => `<div class="segs" aria-hidden="true">${Array.from({length: n}, (_, i) => `<i class="${i < cur ? 'done' : i === cur ? 'cur' : ''}"></i>`).join('')}</div>`;
+
+/* Aufgabentext in Wörter zerlegen; **…** markiert die beiden Rechenzahlen (wird nicht angezeigt) */
+function parts(t){
+  if (t._p) return t._p; const p = [];
+  t.text.split(/(\*\*.+?\*\*)/).forEach(seg => {
+    if (!seg) return;
+    if (seg.startsWith('**')) p.push({w: seg.slice(2, -2), n: true});
+    else seg.split(/(\s+)/).forEach(w => { if (!w) return; if (/^\s+$/.test(w) || /^[.,?!:;]+$/.test(w)) p.push({txt: w}); else p.push({w, n: false}); });
+  });
+  return (t._p = p);
+}
+function textHtml(t, mode, marks){
+  return parts(t).map((x, i) => x.txt !== undefined ? x.txt
+    : mode === 'tap' ? `<button type="button" class="w ${marks.has(i) ? 'on' : ''}" data-w="${i}" aria-pressed="${marks.has(i)}">${x.w}</button>`
+    : x.n && mode === 'marked' ? `<span class="mk">${x.w}</span>` : x.w).join('');
+}
+
+/* ---------- Schema ---------- */
+function marker(id){ return `<marker id="${id}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="${id}"/></marker>`; }
+function eqs(cy){ return `<path class="eqs" d="M171 ${cy - 1}H189M171 ${cy + 5}H189M175 ${cy - 6}L180 ${cy - 11}L185 ${cy - 6}"/>`; }
+function arrow1(f, act){
+  const [sx, sy] = P[f.start], [px, py] = P[f.partner]; const dx = Math.sign(px - sx), dy = Math.sign(py - sy);
+  const x1 = sx + dx * 64, y1 = sy + dy * 12, x2 = px - dx * 66, y2 = py - dy * 13;
+  const mx = (x1 + x2) / 2, my = (y1 + y2) / 2, Ln = Math.hypot(x2 - x1, y2 - y1), ux = (x2 - x1) / Ln, uy = (y2 - y1) / Ln;
+  const c = act ? 'acc' : 'ink';
+  return `<g class="arr ${c}"><path pathLength="1" d="M${x1} ${y1}L${mx - 13 * ux} ${my - 13 * uy}"/><path pathLength="1" d="M${mx + 13 * ux} ${my + 13 * uy}L${x2} ${y2}" marker-end="url(#mk-${c})"/>`
+    + `<circle class="op" cx="${mx}" cy="${my}" r="13"/><circle class="dot" cx="${mx}" cy="${my}" r="2.8"/>`
+    + `<text class="sv-step" x="${sx + dx * 40}" y="${sy + dy * 35 + 5}" text-anchor="middle">①</text></g>`;
+}
+function arrow2(f, act){
+  const [px, py] = P[f.partner], [vx] = P[f.divisor]; const top = py < 140; const rY = top ? 50 : 232, eY = top ? 73 : 209;
+  const sP = px + (px > 180 ? -30 : 30), sD = vx + (vx > 180 ? -30 : 30), dir = Math.sign(sD - sP), endY = top ? eY - 3 : eY + 3;
+  const c = act ? 'acc' : 'ink';
+  return `<g class="arr ${c}"><path pathLength="1" stroke-linejoin="round" d="M${sP} ${eY}V${rY}H${180 - dir * 13}"/><path pathLength="1" stroke-linejoin="round" d="M${180 + dir * 13} ${rY}H${sD}V${endY}" marker-end="url(#mk-${c})"/>`
+    + `<circle class="op" cx="180" cy="${rY}" r="13"/><circle class="dot" cx="180" cy="${rY - 4.5}" r="2.5"/><circle class="dot" cx="180" cy="${rY + 4.5}" r="2.5"/>`
+    + `<text class="sv-step" x="${sP + (sP > 180 ? 16 : -16)}" y="${top ? rY + 19 : rY - 8}" text-anchor="middle">②</text></g>`;
+}
+function schema(o){
+  const {t, grid} = o;
+  const head = k => k === 'p' ? 'Prozent' : k === 'v' ? t.head : '';
+  let s = `<svg viewBox="0 0 360 252" aria-hidden="true"><defs>${marker('mk-ink')}${marker('mk-acc')}</defs>`
+    + `<text class="sv-head" x="80" y="20" text-anchor="middle">${head(kind(grid.TL) || kind(grid.BL))}</text>`
+    + `<text class="sv-head" x="280" y="20" text-anchor="middle">${head(kind(grid.TR) || kind(grid.BR))}</text>`
+    + eqs(96) + eqs(186);
+  if (o.flow && o.arrows >= 1) s += arrow1(o.flow, o.active === 1);
+  if (o.flow && o.arrows >= 2) s += arrow2(o.flow, o.active === 2);
+  s += '</svg>';
+  const cells = KEYS.map(k => {
+    const [cx, cy] = P[k], r = grid[k], locked = o.locked && o.locked.has(k);
+    let txt = '', cls = 'cell';
+    if (!r) cls += ' empty';
+    else if (r === t.sought) { if (o.result) { txt = L(r, t); cls += ' res'; } else { txt = '?'; cls += ' q'; } }
+    else txt = label(r, t);
+    if (o.selCell === k) cls += ' target';
+    const style = `left:${(cx - 62) / 3.6}%;top:${(cy - 23) / 2.52}%;width:${124 / 3.6}%;height:${46 / 2.52}%`;
+    const aria = `Feld ${NAMES[k]}: ${txt ? txt.replace('?', 'Fragezeichen') : 'leer'}`;
+    return (o.interactive && !locked)
+      ? `<button type="button" class="${cls} tap" data-cell="${k}" style="${style}" aria-label="${aria}">${txt}</button>`
+      : `<div class="${cls}" style="${style}" role="img" aria-label="${aria}">${txt}</div>`;
+  }).join('');
+  return `<div class="schema">${s}${cells}</div>`;
+}
+
+/* ---------- Startseite ---------- */
+function renderHome(){
+  const st = load();
+  app.innerHTML = `
+    <h1>Der Zaubertrick</h1>
+    <p class="lead">Prozentrechnen über Kreuz. Jede Aufgabe gehst du in kleinen Schritten durch.</p>
+    <button class="demo-btn" data-act="demo"><span class="t">So geht der Zaubertrick</span><span class="d">Zwei Beispiele, Schritt für Schritt</span></button>
+    <h2>Üben</h2>
+    <div class="menu">${[1, 2, 3].map(n => {
+      const r = st['s' + n];
+      return `<button data-stage="${n}"><span class="nr">${n}</span><span class="t">${STAGES[n].title}</span><span class="d">${STAGES[n].desc}</span>`
+        + (r ? `<span class="last">Zuletzt: ${r.good} von ${r.total} ohne Fehler</span>` : '') + `</button>`;
+    }).join('')}</div>`;
+}
+
+/* ---------- Vorführung ---------- */
+function renderDemo(){
+  const ex = DEMO[S.demo.ex], i = S.demo.step, st = ex.steps[i], t = ex.t, full = stdGrid(t), n = ex.steps.length;
+  const grid = st.show === 'top' ? {TL: full.TL, TR: full.TR} : full;
+  const last = i === n - 1;
+  app.innerHTML = `
+    <header class="bar"><button class="back" data-act="home">‹ Übersicht</button><span class="stage">So geht der Zaubertrick</span></header>
+    <div class="prog"><span>Beispiel ${S.demo.ex + 1} von ${DEMO.length}</span><span>Schritt ${i + 1} von ${n}</span></div>
+    ${segs(n, i)}
+    <h2>${st.title}</h2>
+    <p class="aufgabe ${i === 0 ? 'big' : ''}">${textHtml(t, 'marked')}</p>
+    <p class="erklaerung" aria-live="polite">${st.text}</p>
+    ${st.show ? schema({t, grid, flow: st.arrows ? flowOf(full, t) : null, arrows: st.arrows || 0, active: st.result ? 0 : st.arrows, result: st.result}) : ''}
+    <div class="actions">
+      ${i > 0 ? `<button class="btn ghost" data-act="demoPrev">Zurück</button>` : ''}
+      ${!last ? `<button class="btn" data-act="demoNext">Weiter</button>`
+        : S.demo.ex === 0 ? `<button class="btn" data-demo="1">Beispiel 2 ansehen</button>`
+        : `<button class="btn" data-stage="1">Jetzt üben: Stufe 1</button>`}
+    </div>`;
+}
+
+/* ---------- Üben ---------- */
+function startRound(stage){
+  const by = {PW: [], PS: [], GW: []}; POOL.forEach(t => by[t.sought].push(t));
+  const list = shuffle([].concat(...['PW', 'PS', 'GW'].map(k => shuffle(by[k]).slice(0, ROUND[stage][k]))));
+  const fade = (load().fade || {})[stage] || {streak: 0, faded: false};
+  S = {view: 'task', task: {stage, list, idx: 0, good: 0, fade, notice: null}};
+  startTask();
+}
+function startTask(){
+  const T = S.task, t = T.list[T.idx], std = stdGrid(t);
+  const full = T.stage > 1 && !T.fade.faded;
+  const steps = T.stage === 1 ? ['lesen', 'p1', 'p2', 'ergebnis']
+    : full ? ['lesenMark', 'ganzeDa'].concat(t.sought === 'GW' ? [] : ['ganzeWelche'], ['schema', 'p1', 'p2', 'pruefen'])
+    : ['lesen', 'schema', 'p1', 'p2', 'ergebnis'];
+  Object.assign(T, {t, std, step: 0, clean: true, preErr: false, coreErr: false, full, steps,
+    product: null, result: null, c1: null, flow: null, marks: new Set()});
+  if (T.stage === 1) { T.grid = {...std}; T.locked = new Set(KEYS); T.chips = []; }
+  else if (T.stage === 2) { T.grid = {TL: std.TL, TR: std.TR, BL: null, BR: null}; T.locked = new Set(['TL', 'TR']); T.chips = shuffle([std.BL, std.BR]); }
+  else { T.grid = {TL: null, TR: null, BL: null, BR: null}; T.locked = new Set(); T.chips = shuffle(KEYS.map(k => std[k])); }
+  enterStep();
+}
+const curId = () => S.task.steps[S.task.step];
+function enterStep(){
+  const T = S.task, id = curId();
+  Object.assign(T, {tries: 0, ok: false, wait: false, msg: null, wrong: [], picked: null, selChip: null, selCell: null, opts: null});
+  if (id === 'lesen' || id === 'ergebnis') T.ok = true;
+  if (id === 'ganzeDa' || id === 'ganzeWelche' || id === 'pruefen') T.opts = makeOpts(id, T.t);
+  if (id === 'p1') T.flow = flowOf(T.grid, T.t);
+  if (T.step === 0 && T.notice) { T.msg = {c: 'info', x: T.notice}; T.notice = null; }
+  render();
+}
+
+/* Auswahlfragen: Optionen, richtige Antwort, Rückmeldungen */
+function makeOpts(id, t){
+  if (id === 'ganzeDa') return shuffle([{k:'ja', x:'Ja, das Ganze steht in der Aufgabe.'}, {k:'nein', x:'Nein, das Ganze ist gesucht.'}]);
+  if (id === 'ganzeWelche') return shuffle([{k:'GW', x: L('GW', t)}, {k: t.sought === 'PS' ? 'PW' : 'PS', x: L(t.sought === 'PS' ? 'PW' : 'PS', t)}]);
+  // Prüfen: geordnete Skala, eine Option ist unmöglich
+  if (t.sought === 'PW') { const h = t.gw / 2;
+    return [{k:'lo', x:`weniger als ${amt(h, t)}`}, {k:'hi', x:`zwischen ${amt(h, t)} und ${L('GW', t)}`}, {k:'imp', x:`mehr als ${L('GW', t)}`}]; }
+  if (t.sought === 'PS') return [{k:'lo', x:'weniger als 50 %'}, {k:'hi', x:'zwischen 50 % und 100 %'}, {k:'imp', x:'mehr als 100 %'}];
+  const d = t.pw * 2;
+  return [{k:'imp', x:`weniger als ${L('PW', t)}`}, {k:'lo', x:`zwischen ${L('PW', t)} und ${amt(d, t)}`}, {k:'hi', x:`mehr als ${amt(d, t)}`}];
+}
+function rightKey(id, t){
+  if (id === 'ganzeDa') return t.sought === 'GW' ? 'nein' : 'ja';
+  if (id === 'ganzeWelche') return 'GW';
+  if (t.sought === 'PW') return t.ps < 50 ? 'lo' : 'hi';
+  if (t.sought === 'PS') return t.pw < t.gw / 2 ? 'lo' : 'hi';
+  return t.ps > 50 ? 'lo' : 'hi';
+}
+function okMsg(id, t){
+  if (id === 'ganzeDa') return t.sought === 'GW' ? `Richtig. ${L('PW', t)} sind nur ein Teil. Das Ganze ist gesucht.` : 'Richtig. Eine der beiden Zahlen ist das Ganze.';
+  if (id === 'ganzeWelche') return `Richtig. ${L('GW', t)} sind das Ganze. Das Ganze ist immer 100 %.`;
+  const k = rightKey(id, t);
+  if (t.sought === 'PW') return k === 'lo' ? `Richtig. ${L('PS', t)} ist weniger als die Hälfte. Also ist das Ergebnis weniger als ${amt(t.gw / 2, t)}.`
+    : `Richtig. ${L('PS', t)} ist mehr als die Hälfte, aber weniger als 100 %. Also liegt das Ergebnis zwischen ${amt(t.gw / 2, t)} und ${L('GW', t)}.`;
+  if (t.sought === 'PS') return k === 'lo' ? `Richtig. ${L('PW', t)} sind weniger als die Hälfte von ${L('GW', t)}. Also weniger als 50 %.`
+    : `Richtig. ${L('PW', t)} sind mehr als die Hälfte von ${L('GW', t)}. Also mehr als 50 %.`;
+  return k === 'lo' ? `Richtig. ${L('PW', t)} sind ${L('PS', t)}, also mehr als die Hälfte. Darum ist das Ganze weniger als das Doppelte.`
+    : `Richtig. ${L('PW', t)} sind nur ${L('PS', t)}, also weniger als die Hälfte. Darum ist das Ganze mehr als das Doppelte.`;
+}
+function badMsg(id, k, t){
+  if (id === 'ganzeDa') return t.sought === 'GW' ? `Schau genau hin: Sind ${L('PW', t)} wirklich alles? Oder nur ein Teil davon?`
+    : 'Lies noch einmal. Eine Zahl in der Aufgabe ist das Ganze: zum Beispiel der ganze Preis, die ganze Strecke oder alle zusammen.';
+  if (id === 'ganzeWelche') return k === 'PS' ? 'Eine Prozentzahl ist nie das Ganze. Das Ganze sind immer 100 %.' : `${L('PW', t)} sind nur ein Teil vom Ganzen.`;
+  if (k === 'imp') return t.sought === 'GW' ? 'Das Ganze ist immer mehr als ein Teil.' : t.sought === 'PS' ? 'Ein Teil ist nie mehr als 100 %.' : 'Ein Teil kann nie mehr sein als das Ganze.';
+  if (t.sought === 'PW') return `Vergleiche ${L('PS', t)} mit der Hälfte. Die Hälfte sind 50 %.`;
+  if (t.sought === 'PS') return `Die Hälfte von ${L('GW', t)} sind ${amt(t.gw / 2, t)}. Vergleiche ${L('PW', t)} damit.`;
+  return `Vergleiche ${L('PS', t)} mit der Hälfte (50 %). Ist ${L('PW', t)} mehr oder weniger als die Hälfte vom Ganzen?`;
+}
+
+const GANZE_TIPS = ['Das Ganze ist alles: der ganze Preis, die ganze Strecke, alle Personen.', 'Eine Prozentzahl ist nie das Ganze.', 'Ein Teil ist kleiner als das Ganze.'];
+const TIPS = {
+  lesenMark: () => ['Zahlen erkennst du an den Ziffern.', 'Tippe die Zahl an. Die Einheit, zum Beispiel € oder %, wird mit markiert.', 'Tippst du falsch, tippe noch einmal. Dann ist die Markierung weg.'],
+  ganzeDa: () => GANZE_TIPS, ganzeWelche: () => GANZE_TIPS,
+  schema: t => [`Gleiches steht untereinander: Prozent unter Prozent, ${t.head} unter ${t.head}.`, 'Kennst du das Ganze? Dann steht es neben 100 %.',
+                'Ist das Ganze gesucht? Dann steht das Fragezeichen neben 100 %.', 'Die beiden anderen Karten stehen zusammen in der anderen Zeile.'],
+  pruefen: () => ['50 % sind die Hälfte.', 'Ein Teil ist immer weniger als das Ganze.', 'Du musst hier nicht genau rechnen.'],
+  p1: () => ['Du darfst den Taschenrechner benutzen.', 'Pfeil ① verbindet zwei Zahlen über Kreuz.', 'Schreib nur die Zahlen, ohne € oder %.'],
+  p2: () => ['Du darfst den Taschenrechner benutzen.', 'Pfeil ② zeigt auf die dritte Zahl.', 'Teile dein Ergebnis von ① durch diese Zahl.']
+};
+
+function stepBody(id, T){
+  const t = T.t, f = T.flow;
+  const opts = () => `<div class="opts ${T.ok ? 'done' : T.wait ? 'wait' : ''}" role="group">${T.opts.map(o => {
+      const c = T.ok && o.k === T.picked ? 'right' : T.wrong.includes(o.k) ? 'wrong' : '';
+      return `<button type="button" class="opt ${c}" data-opt="${o.k}" ${T.ok || T.wait || T.wrong.includes(o.k) ? 'disabled' : ''}>${o.x}</button>`; }).join('')}</div>`;
+  const line1 = T.c1 ? `<p class="erledigt"><span class="sn">①</span> ${fmt(T.c1[0])} · ${fmt(T.c1[1])} = ${fmt(T.product)}</p>` : '';
+  const line2 = T.result !== null ? `<p class="erledigt"><span class="sn">②</span> ${fmt(T.product)} : ${fmt(val(T.grid[f.divisor], t))} = ${fmt(T.result)}</p>` : '';
+  switch (id) {
+    case 'lesen': return {ask: 'Lies die Aufgabe in Ruhe. Tippe dann auf „Weiter“.', ui: ''};
+    case 'lesenMark': return {ask: T.ok ? 'Mit diesen beiden Zahlen rechnest du.' : 'Lies die Aufgabe. Tippe dann die beiden Zahlen an, mit denen du rechnest.',
+      ui: '', action: `<button class="btn" data-act="checkLesen">Prüfen</button>`};
+    case 'ganzeDa': return {ask: 'Steht das Ganze in der Aufgabe?', ui: opts()};
+    case 'ganzeWelche': return {ask: 'Welche Zahl ist das Ganze?', ui: opts()};
+    case 'schema': {
+      const ask = T.stage === 1
+        ? (t.sought === 'GW' ? 'Das Ganze ist gesucht. Darum stehen oben die beiden Zahlen aus der Aufgabe. Unten stehen 100 % und das Fragezeichen.'
+                             : 'Das Ganze ist bekannt. Darum stehen oben 100 % und das Ganze. Unten stehen die zweite Zahl und das Fragezeichen.')
+        : T.ok ? 'So ist dein Schema richtig.'
+        : T.stage === 2 ? 'Trag die untere Zeile ein. Tipp zuerst auf eine Karte und dann auf ein Feld.'
+        : 'Trag alle vier Karten ein. Tipp zuerst auf eine Karte und dann auf ein Feld.';
+      const sch = schema({t, grid: T.grid, locked: T.locked, interactive: T.stage > 1 && !T.ok, selCell: T.selCell, arrows: 0});
+      const tray = T.stage > 1 && !T.ok ? `<div class="tray">${T.chips.length
+          ? T.chips.map((r, i) => `<button type="button" class="chip ${T.selChip === i ? 'sel' : ''}" data-chip="${i}" aria-pressed="${T.selChip === i}">${label(r, t)}</button>`).join('')
+          : '<p class="tray-empty">Alle Karten sind eingetragen.</p>'}</div>` : '';
+      return {ask, ui: sch + tray, action: T.stage > 1 ? `<button class="btn" data-act="checkPlace">Prüfen</button>` : ''};
+    }
+    case 'p1': return {ask: (T.stage === 1 ? 'Das Schema ist schon fertig. ' : '') + 'Pfeil ① verbindet zwei Zahlen. Nimm sie mal.',
+      ui: schema({t, grid: T.grid, flow: f, arrows: 1, active: 1}) + (T.ok ? line1
+        : `<form class="rechnung" id="f-calc" data-form="c1" autocomplete="off"><span class="sn">①</span>
+            <input id="c1a" inputmode="decimal" aria-label="erste Zahl"><span>·</span><input id="c1b" inputmode="decimal" aria-label="zweite Zahl">
+            <span>=</span><input id="c1c" class="wide" inputmode="decimal" aria-label="Ergebnis der Malaufgabe"></form>`),
+      action: `<button class="btn" type="submit" form="f-calc">Prüfen</button>`};
+    case 'p2': return {ask: 'Pfeil ② zeigt auf die Zahl, durch die du teilst.',
+      ui: schema({t, grid: T.grid, flow: f, arrows: 2, active: 2, result: T.ok}) + line1 + (T.ok ? line2
+        : `<form class="rechnung" id="f-calc" data-form="c2" autocomplete="off"><span class="sn">②</span><span class="fix">${fmt(T.product)}</span>
+            <span>:</span><input id="c2b" inputmode="decimal" aria-label="Zahl, durch die du teilst"><span>=</span><input id="c2c" class="wide" inputmode="decimal" aria-label="Ergebnis der Geteiltaufgabe"></form>`),
+      action: `<button class="btn" type="submit" form="f-calc">Prüfen</button>`};
+    case 'pruefen': {
+      const ask = t.sought === 'PW' ? `Gesucht waren ${L('PS', t)} von ${L('GW', t)}. Wo muss das Ergebnis liegen?`
+        : t.sought === 'PS' ? `Gesucht war, wie viel Prozent ${L('PW', t)} von ${L('GW', t)} sind. Wo muss das Ergebnis liegen?`
+        : `Gesucht war das Ganze. ${L('PW', t)} sind ${L('PS', t)}. Wo muss das Ganze liegen?`;
+      return {ask, ui: opts() + (T.ok ? `<p class="feedback ok" role="status">${T.msg.x}</p><p class="erklaerung">Dein Ergebnis: ${L(t.sought, t)}. Es liegt im richtigen Bereich.</p>
+        <p class="antwort"><strong>Antwort:</strong> ${t.answer.replace('{r}', fmt(T.result))}</p>` : '')};
+    }
+    case 'ergebnis': return {ask: '', ui: line2 + `<p class="antwort"><strong>Antwort:</strong> ${t.answer.replace('{r}', fmt(T.result))}</p>`};
+  }
+}
+
+function renderTask(){
+  const T = S.task, st = STAGES[T.stage], id = curId(), n = T.steps.length, last = T.step === n - 1;
+  const b = stepBody(id, T), m = id === 'pruefen' && T.ok ? null : T.msg;
+  const nextLabel = !last ? 'Weiter' : T.idx + 1 < T.list.length ? 'Nächste Aufgabe' : 'Runde beenden';
+  const tips = TIPS[id] && !T.ok && !(id === 'schema' && T.stage === 1) ? `<details class="tipp"><summary>Tipp</summary><ul>${TIPS[id](T.t).map(x => `<li>${x}</li>`).join('')}</ul></details>` : '';
+  const mode = id === 'lesenMark' && !T.ok ? 'tap' : T.marks.size ? 'marked' : 'plain';
+  app.innerHTML = `
+    <header class="bar"><button class="back" data-act="home">‹ Übersicht</button><span class="stage">${st.name}: ${st.title}</span></header>
+    <div class="prog"><span>Aufgabe ${T.idx + 1} von ${T.list.length}</span><span>Schritt ${T.step + 1} von ${n}</span></div>
+    ${segs(n, T.step)}
+    <h2>${TITLES[id]}</h2>
+    <p class="aufgabe ${id === 'lesen' || id === 'lesenMark' ? 'big' : ''}">${textHtml(T.t, mode, T.marks)}</p>
+    ${b.ask ? `<p class="anweisung">${b.ask}</p>` : ''}
+    ${b.ui}
+    ${m ? `<p class="feedback ${m.c}" role="status">${m.x}${m.retry ? `<br><button class="linkbtn" data-act="retry">Noch einmal versuchen</button>` : m.reveal ? `<br><button class="linkbtn" data-act="reveal">Lösung zeigen</button>` : ''}</p>` : ''}
+    <div class="actions">${T.ok ? `<button class="btn" data-act="next">${nextLabel}</button>` : T.wait ? '' : (b.action || '')}</div>
+    ${tips}`;
+  const first = app.querySelector('form input');
+  if (first && matchMedia('(pointer: fine)').matches) first.focus({preventScroll: true});
+}
+
+/* Fehler merken: Kernschritte (Schema, Pfeile) getrennt von den Schritten drumherum */
+function markErr(){ const T = S.task, id = curId(); T.clean = false; if (['schema', 'p1', 'p2'].includes(id)) T.coreErr = true; else T.preErr = true; if (id === 'schema') T.preErr = true; }
+function bad(text, revealAfter){ const T = S.task; T.tries++; markErr(); T.msg = {c: 'bad', x: text, reveal: revealAfter && T.tries >= revealAfter}; render(); }
+function good(text){ const T = S.task; T.ok = true; T.msg = {c: 'ok', x: text}; render(); }
+
+function onOpt(k){
+  const T = S.task, id = curId(); if (T.ok || T.wait) return;
+  if (k === rightKey(id, T.t)) { T.picked = k; good(okMsg(id, T.t)); }
+  else {
+    if (!T.wrong.includes(k)) T.wrong.push(k);
+    markErr(); T.wait = true; T.msg = {c: 'bad', x: badMsg(id, k, T.t), retry: true}; render();
+  }
+}
+
+/* Ausblenden: Zwischenschritte fallen nach FADE_AFTER fehlerfreien Aufgaben weg und kommen bei Fehlern im Schema oder in der Rechnung zurück */
+function updateFade(){
+  const T = S.task; if (T.stage === 1) return;
+  const F = T.fade;
+  if (T.full) {
+    F.streak = T.preErr ? 0 : F.streak + 1;
+    if (F.streak >= FADE_AFTER) { F.faded = true; F.streak = 0; T.notice = 'Du erkennst das Ganze jetzt sicher. Ab jetzt geht es nach dem Lesen direkt zum Schema.'; }
+  } else if (T.coreErr) {
+    F.faded = false; F.streak = 0; T.notice = 'Bei der letzten Aufgabe gab es einen Fehler. Darum kommen die Zwischenschritte jetzt wieder.';
+  }
+  const st = load(); st.fade = st.fade || {}; st.fade[T.stage] = F; save(st);
+}
+
+function checkLesen(){
+  const T = S.task, p = parts(T.t), marked = [...T.marks];
+  if (!marked.length) { T.msg = {c: 'info', x: 'Tippe die beiden Zahlen in der Aufgabe an.'}; return render(); }
+  if (marked.some(i => !p[i].n)) return bad('Markiere nur die Zahlen, mit denen du rechnest. Wörter brauchst du nicht.', 2);
+  if (marked.length < 2) return bad('Es fehlt noch eine Zahl.', 2);
+  good('Richtig. Mit diesen beiden Zahlen rechnest du.');
+}
+
+function checkPlace(){
+  const T = S.task, g = T.grid, t = T.t;
+  if (KEYS.some(k => !g[k])) { T.msg = {c: 'info', x: 'Trag zuerst alle Karten ins Schema ein.'}; return render(); }
+  const pair = (a, b) => { const s = [a, b].sort().join(); return s === 'GW,P100' || s === 'PS,PW'; };
+  if (kind(g.TL) !== kind(g.BL) || kind(g.TR) !== kind(g.BR)) return bad(`Gleiches muss untereinander stehen: Prozent unter Prozent, ${t.head} unter ${t.head}.`, 3);
+  if (!pair(g.TL, g.TR) || !pair(g.BL, g.BR)) return bad(t.sought === 'GW' ? 'Das Ganze ist gesucht. Darum steht das Fragezeichen neben den 100 %.'
+    : `Das Ganze sind ${L('GW', t)}. Diese Zahl steht neben den 100 %.`, 3);
+  good('Richtig eingetragen.');
+}
+
+function checkCalc(form){
+  const T = S.task, t = T.t, f = T.flow;
+  if (form === 'c1') {
+    const a = num(gv('c1a')), b = num(gv('c1b')), c = num(gv('c1c'));
+    if ([a, b, c].some(isNaN)) { T.msg = {c: 'info', x: 'Füll alle drei Felder aus.'}; return render(); }
+    const vS = val(T.grid[f.start], t), vP = val(T.grid[f.partner], t);
+    if (!((same(a, vS) && same(b, vP)) || (same(a, vP) && same(b, vS)))) return bad('Schau auf Pfeil ①: Er verbindet zwei Zahlen. Schreib genau diese zwei Zahlen.', 2);
+    if (!same(c, vS * vP)) return bad('Die Malaufgabe stimmt noch nicht. Rechne noch einmal nach.', 2);
+    T.c1 = [vS, vP]; T.product = vS * vP; good('Richtig.');
+  } else {
+    const d = num(gv('c2b')), e = num(gv('c2c'));
+    if ([d, e].some(isNaN)) { T.msg = {c: 'info', x: 'Füll beide Felder aus.'}; return render(); }
+    const dv = val(T.grid[f.divisor], t);
+    if (!same(d, dv)) return bad('Pfeil ② zeigt auf die Zahl, durch die du teilst. Schau, wohin er zeigt.', 2);
+    if (!same(e, T.product / dv)) return bad('Die Geteiltaufgabe stimmt noch nicht. Rechne noch einmal nach.', 2);
+    T.result = T.product / dv; good('Richtig.');
+  }
+}
+
+function reveal(){
+  const T = S.task, t = T.t, id = curId(); markErr(); T.ok = true;
+  if (id === 'lesenMark') { const p = parts(t); T.marks = new Set(p.map((x, i) => x.n ? i : -1).filter(i => i >= 0)); T.msg = {c: 'info', x: 'Das sind die beiden Zahlen, mit denen du rechnest.'}; }
+  else if (id === 'schema') { T.grid = {...T.std}; T.chips = []; T.msg = {c: 'info', x: 'So ist es richtig eingetragen. Vergleiche mit deinem Versuch.'}; }
+  else if (id === 'p1') { const f = T.flow, vS = val(T.grid[f.start], t), vP = val(T.grid[f.partner], t);
+    T.c1 = [vS, vP]; T.product = vS * vP; T.msg = {c: 'info', x: 'So ist die Malaufgabe richtig.'}; }
+  else if (id === 'p2') { T.result = T.product / val(T.grid[T.flow.divisor], t); T.msg = {c: 'info', x: 'So ist die Geteiltaufgabe richtig.'}; }
+  render();
+}
+
+function onWord(i){ const T = S.task; if (T.ok) return; T.marks.has(i) ? T.marks.delete(i) : T.marks.add(i); T.msg = null; render(); }
+function onCell(k){
+  const T = S.task;
+  if (T.grid[k]) { const old = T.grid[k]; if (T.selChip !== null) { T.grid[k] = T.chips.splice(T.selChip, 1)[0]; T.selChip = null; } else T.grid[k] = null; T.chips.push(old); T.selCell = null; }
+  else if (T.selChip !== null) { T.grid[k] = T.chips.splice(T.selChip, 1)[0]; T.selChip = null; }
+  else T.selCell = T.selCell === k ? null : k;
+  T.msg = null; render();
+}
+function onChip(i){
+  const T = S.task;
+  if (T.selCell) { T.grid[T.selCell] = T.chips.splice(i, 1)[0]; T.selCell = null; T.selChip = null; }
+  else T.selChip = T.selChip === i ? null : i;
+  T.msg = null; render();
+}
+
+function next(){
+  const T = S.task;
+  if (T.step < T.steps.length - 1) { T.step++; enterStep(); }
+  else { if (T.clean) T.good++; updateFade(); T.idx++; if (T.idx >= T.list.length) { S.view = 'end'; render(); } else startTask(); }
+  window.scrollTo(0, 0);
+}
+
+function renderEnd(){
+  const T = S.task, n = T.list.length;
+  const st = load(); st['s' + T.stage] = {good: T.good, total: n}; save(st);
+  app.innerHTML = `
+    <header class="bar"><button class="back" data-act="home">‹ Übersicht</button><span class="stage">${STAGES[T.stage].name}: ${STAGES[T.stage].title}</span></header>
+    <h2>Runde geschafft</h2>
+    <p class="score">${T.good} von ${n}</p>
+    <p class="lead">So viele Aufgaben hast du ganz ohne Fehler gelöst.</p>
+    <div class="actions">
+      <button class="btn ${T.stage < 3 ? 'ghost' : ''}" data-stage="${T.stage}">Neue Runde</button>
+      ${T.stage < 3 ? `<button class="btn" data-stage="${T.stage + 1}">Weiter mit Stufe ${T.stage + 1}</button>` : ''}
+    </div>`;
+}
+
+function render(){
+  if (S.view === 'home') renderHome();
+  else if (S.view === 'demo') renderDemo();
+  else if (S.view === 'end') renderEnd();
+  else renderTask();
+}
+
+app.addEventListener('click', e => {
+  const b = e.target.closest('[data-act],[data-cell],[data-chip],[data-stage],[data-demo],[data-opt],[data-w]'); if (!b) return;
+  if (b.dataset.w !== undefined) return onWord(+b.dataset.w);
+  if (b.dataset.cell) return onCell(b.dataset.cell);
+  if (b.dataset.chip !== undefined) return onChip(+b.dataset.chip);
+  if (b.dataset.opt) return onOpt(b.dataset.opt);
+  if (b.dataset.stage) { startRound(+b.dataset.stage); window.scrollTo(0, 0); return; }
+  if (b.dataset.demo !== undefined) { S = {view: 'demo', demo: {ex: +b.dataset.demo, step: 0}}; render(); window.scrollTo(0, 0); return; }
+  const a = b.dataset.act;
+  if (a === 'home') { S = {view: 'home'}; render(); window.scrollTo(0, 0); }
+  else if (a === 'demo') { S = {view: 'demo', demo: {ex: 0, step: 0}}; render(); window.scrollTo(0, 0); }
+  else if (a === 'demoNext') { S.demo.step++; render(); }
+  else if (a === 'demoPrev') { S.demo.step = Math.max(0, S.demo.step - 1); render(); }
+  else if (a === 'checkLesen') checkLesen();
+  else if (a === 'checkPlace') checkPlace();
+  else if (a === 'retry') { S.task.wait = false; S.task.msg = null; render(); }
+  else if (a === 'reveal') reveal();
+  else if (a === 'next') next();
+});
+app.addEventListener('submit', e => { e.preventDefault(); checkCalc(e.target.dataset.form); });
+
+render();
+</script>
+
+</body></html>
